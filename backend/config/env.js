@@ -8,6 +8,7 @@ try {
         PORT: process.env.PORT,
         MONGODB_URI: process.env.DATABASE_URL,
         YOUTUBE_DATA_API_KEY: process.env.YOUTUBE_DATA_API_KEY,
+        JWT_SECRET: process.env.JWT_SECRET,
     };
 } catch (error) {
     console.error("Error loading environment variables:", error);
