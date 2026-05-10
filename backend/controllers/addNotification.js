@@ -5,13 +5,12 @@ export const addNotification = async (req, res) => {
     try {
 
         const {
-            userId,
             title,
             message
         } = req.body;
 
         const user = await User.findById(
-            userId
+            req.user.id
         );
 
         if (!user) {

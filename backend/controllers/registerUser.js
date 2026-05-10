@@ -8,14 +8,21 @@ export const registerUser = async (req,res) =>{
             username: username,
             passwordHash: password
         })
-        res.json({
+        res.status(201).json({
             status: true,
             message: "User registered successfully"
         })
     }catch(error){
-        res.json({
+        console.log("Registration Error:", error.code, error.message);
+        if (error.code === 11000) {
+            return res.status(400).json({
+                status: false,
+                message: "Username already exists"
+            });
+        }
+        res.status(500).json({
             status: false,
-            message: "Error registering user"
+            message: "Error registering user: " + error.message
         })
     }
 }
