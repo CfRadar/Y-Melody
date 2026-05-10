@@ -1,4 +1,4 @@
-import moongoose from 'mongoose';
+import moongoose from 'moongoose';
 import env from "./env.js";
 
 const connectDB = async () => {
