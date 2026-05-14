@@ -21,7 +21,8 @@ export const getProfile = async (req, res) => {
 
             user: {
                 id: user._id,
-                username: user.username
+                username: user.username,
+                history: user.history || []
             }
         });
 
