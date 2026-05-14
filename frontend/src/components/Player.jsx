@@ -18,6 +18,9 @@ export default function Player({ track, setCurrentTrack, queue, setQueue }) {
   const [repeatMode, setRepeatMode] = useState('OFF'); // 'OFF' | 'ALL' | 'ONE'
   const [shuffle, setShuffle] = useState(false);
   
+  const [draggedQueueIndex, setDraggedQueueIndex] = useState(null);
+  const [draggedOverQueueIndex, setDraggedOverQueueIndex] = useState(null);
+  
   const playerRef = useRef(null);
   const progressInterval = useRef(null);
   
@@ -206,6 +209,35 @@ export default function Player({ track, setCurrentTrack, queue, setQueue }) {
     return `${mm}:${ss}`;
   };
 
+  const handleQueueDragStart = (index) => {
+    setDraggedQueueIndex(index);
+  };
+
+  const handleQueueDragEnter = (index) => {
+    setDraggedOverQueueIndex(index);
+  };
+
+  const handleQueueDragEnd = () => {
+    setDraggedQueueIndex(null);
+    setDraggedOverQueueIndex(null);
+  };
+
+  const handleQueueDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleQueueDrop = (e, index) => {
+    e.preventDefault();
+    if (draggedQueueIndex === null) return;
+    const newQueue = [...queue];
+    const draggedItem = newQueue[draggedQueueIndex];
+    newQueue.splice(draggedQueueIndex, 1);
+    newQueue.splice(index, 0, draggedItem);
+    setQueue(newQueue);
+    setDraggedQueueIndex(null);
+    setDraggedOverQueueIndex(null);
+  };
+
   const opts = {
     height: '100%',
     width: '100%',
@@ -273,7 +305,21 @@ export default function Player({ track, setCurrentTrack, queue, setQueue }) {
           {queue && queue.length > 0 ? (
             <div className="flex flex-col gap-2">
               {queue.map((song, index) => (
-                <div key={index} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors group cursor-pointer" onClick={() => { setCurrentTrack(song); setQueue(queue.filter((_, i) => i !== index)); }}>
+                <div 
+                  key={index} 
+                  draggable
+                  onDragStart={() => handleQueueDragStart(index)}
+                  onDragEnter={() => handleQueueDragEnter(index)}
+                  onDragEnd={handleQueueDragEnd}
+                  onDragOver={handleQueueDragOver}
+                  onDrop={(e) => handleQueueDrop(e, index)}
+                  className={`flex items-center gap-3 p-2 rounded-lg transition-all group cursor-pointer border-2 ${
+                    draggedQueueIndex === index ? 'opacity-30' : 'opacity-100'
+                  } ${
+                    draggedOverQueueIndex === index && draggedQueueIndex !== index ? 'border-primary bg-primary/10' : 'border-transparent hover:bg-white/5'
+                  }`} 
+                  onClick={() => { setCurrentTrack(song); setQueue(queue.filter((_, i) => i !== index)); }}
+                >
                   <div className="w-10 h-10 shrink-0 relative rounded overflow-hidden">
                     <img src={song.thumbnail} alt={song.title} className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
@@ -284,9 +330,14 @@ export default function Player({ track, setCurrentTrack, queue, setQueue }) {
                     <p className="text-body-md text-on-surface font-medium line-clamp-1 group-hover:text-primary transition-colors" dangerouslySetInnerHTML={{ __html: song.title }}></p>
                     <p className="text-label-sm text-on-surface-variant line-clamp-1">{song.artist}</p>
                   </div>
-                  <button onClick={(e) => { e.stopPropagation(); setQueue(queue.filter((_, i) => i !== index)); }} className="opacity-0 group-hover:opacity-100 text-on-surface-variant hover:text-error transition-all p-1">
-                    <span className="material-symbols-outlined text-[18px]">close</span>
-                  </button>
+                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onClick={(e) => { e.stopPropagation(); setQueue(queue.filter((_, i) => i !== index)); }} className="text-on-surface-variant hover:text-error transition-colors p-1">
+                      <span className="material-symbols-outlined text-[18px]">close</span>
+                    </button>
+                    <div className="text-on-surface-variant cursor-grab active:cursor-grabbing p-1 flex items-center justify-center">
+                      <span className="material-symbols-outlined text-[18px]">drag_indicator</span>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>

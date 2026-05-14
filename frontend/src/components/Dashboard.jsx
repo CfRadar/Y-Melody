@@ -53,6 +53,32 @@ export default function Dashboard() {
     setOpenMenuId(null);
   };
 
+  const [isMorningDewLoading, setIsMorningDewLoading] = useState(false);
+
+  const handleMorningDewPlay = async () => {
+    if (isMorningDewLoading) return;
+    setIsMorningDewLoading(true);
+    try {
+      const data = await api.searchYoutube('Nature Sound');
+      if (data && Array.isArray(data) && data.length > 0) {
+        const tracks = data.map(item => ({
+          title: item.snippet.title,
+          artist: item.snippet.channelTitle,
+          thumbnail: item.snippet.thumbnails?.high?.url || item.snippet.thumbnails?.medium?.url || item.snippet.thumbnails?.default?.url,
+          youtubeId: item.id.videoId
+        }));
+        
+        setCurrentTrack(tracks[0]);
+        setIsPlaying(true);
+        setQueue(tracks.slice(1));
+      }
+    } catch (err) {
+      console.error('Error fetching Morning Dew playlist:', err);
+    } finally {
+      setIsMorningDewLoading(false);
+    }
+  };
+
   const history = user?.history || [];
   
   // Group history by date...
@@ -88,9 +114,17 @@ export default function Dashboard() {
             Start your day with soft, organic sounds. Acoustic guitars, gentle synths, and field recordings.
           </p>
           <div className="flex items-center gap-4">
-            <button onClick={() => { setCurrentTrack({ title: 'Morning Dew', artist: 'Curated Mix', thumbnail: '/download.jpg' }); setIsPlaying(true); }} className="px-8 py-4 rounded-full bg-primary hover:bg-primary-fixed-dim text-on-primary font-label-lg text-label-lg font-bold flex items-center gap-2 shadow-[0_0_30px_rgba(161,212,148,0.4)] hover:shadow-[0_0_40px_rgba(161,212,148,0.6)] transition-all transform hover:-translate-y-1">
-              <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
-              Play Now
+            <button 
+              onClick={handleMorningDewPlay} 
+              disabled={isMorningDewLoading}
+              className="px-8 py-4 rounded-full bg-primary hover:bg-primary-fixed-dim text-on-primary font-label-lg text-label-lg font-bold flex items-center gap-2 shadow-[0_0_30px_rgba(161,212,148,0.4)] hover:shadow-[0_0_40px_rgba(161,212,148,0.6)] transition-all transform hover:-translate-y-1 disabled:opacity-70 disabled:hover:translate-y-0"
+            >
+              {isMorningDewLoading ? (
+                <div className="w-5 h-5 border-2 border-on-primary border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
+              )}
+              {isMorningDewLoading ? 'Loading...' : 'Play Now'}
             </button>
             <button className="w-14 h-14 rounded-full border border-white/20 flex items-center justify-center text-on-surface hover:bg-white/10 transition-colors">
               <span className="material-symbols-outlined">favorite_border</span>

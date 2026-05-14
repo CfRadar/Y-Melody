@@ -9,6 +9,8 @@ export default function PlaylistView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openMenuId, setOpenMenuId] = useState(null);
+  const [draggedSongIndex, setDraggedSongIndex] = useState(null);
+  const [draggedOverSongIndex, setDraggedOverSongIndex] = useState(null);
   const { isPlaying, setIsPlaying, currentTrack, setCurrentTrack, queue, setQueue, setModalSong } = useOutletContext();
 
   useEffect(() => {
@@ -67,6 +69,65 @@ export default function PlaylistView() {
     e.stopPropagation();
     setModalSong(song);
     setOpenMenuId(null);
+  };
+
+  const handleRemoveFromPlaylist = async (e, songId) => {
+    e.stopPropagation();
+    setOpenMenuId(null);
+    try {
+      const token = tokenService.getToken();
+      if (token) {
+        const res = await api.removeSongFromPlaylist(token, playlist._id, songId);
+        if (res.status && res.playlist) {
+          setPlaylist(res.playlist);
+        } else {
+          console.error(res.message);
+        }
+      }
+    } catch (err) {
+      console.error('Error removing song:', err);
+    }
+  };
+
+  const handleDragStart = (index) => {
+    setDraggedSongIndex(index);
+  };
+
+  const handleDragEnter = (index) => {
+    setDraggedOverSongIndex(index);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedSongIndex(null);
+    setDraggedOverSongIndex(null);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = async (e, index) => {
+    e.preventDefault();
+    if (draggedSongIndex === null || draggedSongIndex === index) return;
+    
+    const newSongs = [...playlist.songs];
+    const draggedItem = newSongs[draggedSongIndex];
+    newSongs.splice(draggedSongIndex, 1);
+    newSongs.splice(index, 0, draggedItem);
+    
+    // Optimistic UI update
+    setPlaylist({ ...playlist, songs: newSongs });
+    setDraggedSongIndex(null);
+    setDraggedOverSongIndex(null);
+
+    try {
+      const token = tokenService.getToken();
+      if (token) {
+        await api.reorderPlaylistSongs(token, playlist._id, newSongs);
+      }
+    } catch (err) {
+      console.error('Error reordering playlist:', err);
+    }
   };
 
   if (loading) {
@@ -164,7 +225,25 @@ export default function PlaylistView() {
                 const isMenuOpen = openMenuId === trackId;
                 
                 return (
-                  <div key={trackId} className={`group grid grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)_minmax(0,100px)_minmax(0,60px)] gap-4 items-center px-4 py-3 rounded-xl hover:bg-white/5 transition-all duration-200 cursor-pointer relative ${isMenuOpen ? 'z-50' : 'z-10'}`} onClick={() => { setCurrentTrack(song); setIsPlaying(true); }}>
+                  <div 
+                    key={trackId} 
+                    draggable
+                    onDragStart={() => handleDragStart(index)}
+                    onDragEnter={() => handleDragEnter(index)}
+                    onDragEnd={handleDragEnd}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, index)}
+                    className={`group grid grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)_minmax(0,100px)_minmax(0,60px)] gap-4 items-center px-4 py-3 rounded-xl transition-all duration-200 cursor-pointer relative ${
+                      isMenuOpen ? 'z-50' : 'z-10'
+                    } ${
+                      draggedSongIndex === index ? 'opacity-30' : 'opacity-100'
+                    } ${
+                      draggedOverSongIndex === index && draggedSongIndex !== index 
+                        ? draggedSongIndex < index ? 'border-b-2 border-primary bg-white/5' : 'border-t-2 border-primary bg-white/5'
+                        : 'border-y-2 border-transparent hover:bg-white/5'
+                    }`} 
+                    onClick={() => { setCurrentTrack(song); setIsPlaying(true); }}
+                  >
                     {/* Index & Play Icon */}
                     <div className="w-8 text-center text-on-surface-variant font-medium relative flex items-center justify-center">
                       <span className="group-hover:opacity-0 transition-opacity">{index + 1}</span>
@@ -217,7 +296,10 @@ export default function PlaylistView() {
                             <span className="material-symbols-outlined text-[18px]">playlist_add</span>
                             Add to Playlist
                           </button>
-                          <button className="w-full text-left px-4 py-2 hover:bg-white/10 text-body-md text-error flex items-center gap-2 transition-colors" onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); }}>
+                          <button 
+                            className="w-full text-left px-4 py-2 hover:bg-white/10 text-body-md text-error flex items-center gap-2 transition-colors" 
+                            onClick={(e) => handleRemoveFromPlaylist(e, song._id)}
+                          >
                             <span className="material-symbols-outlined text-[18px]">delete</span>
                             Remove
                           </button>

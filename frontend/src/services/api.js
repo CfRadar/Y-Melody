@@ -119,6 +119,32 @@ export const api = {
     return data;
   },
 
+  removeSongFromPlaylist: async (token, playlistId, songId) => {
+    const response = await fetch(`${API_BASE_URL}/user/playlist/song/delete`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ playlistId, songId }),
+    });
+    const data = await response.json();
+    return data;
+  },
+
+  reorderPlaylistSongs: async (token, playlistId, songs) => {
+    const response = await fetch(`${API_BASE_URL}/user/playlist/song/reorder`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ playlistId, songs }),
+    });
+    const data = await response.json();
+    return data;
+  },
+
   addToHistory: async (token, track) => {
     const response = await fetch(`${API_BASE_URL}/user/history/add`, {
       method: 'POST',
