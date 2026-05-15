@@ -1,7 +1,5 @@
 # Y-Melodies (Organic Sound)
 
-![Y-Melodies Hero Banner](https://via.placeholder.com/1200x400/131313/e5e2e1?text=Y-Melodies+-+Organic+Sound)
-
 Y-Melodies is a modern, full-stack web application designed for discovering and streaming music seamlessly. It features an intuitive, highly responsive UI built with React and a robust backend powered by Node.js, Express, and MongoDB.
 
 ---
@@ -10,19 +8,15 @@ Y-Melodies is a modern, full-stack web application designed for discovering and 
 
 ### 1. Music Discovery & Search
 Instantly search for artists, moods, or frequencies using the YouTube Data API integration. View results in a highly visual grid with instant play actions.
-![Discovery Screen Placeholder](https://via.placeholder.com/800x400/131313/68d3ff?text=Discovery+Screen)
 
 ### 2. Custom Playlists & Queue Management
 Create, rename, delete, and manage personalized playlists. Easily add songs to your playback queue and reorder them on the fly.
-![Playlist Screen Placeholder](https://via.placeholder.com/800x400/131313/68d3ff?text=Playlist+Management)
 
 ### 3. Smart Listening History & Top Artists
 The app automatically tracks your playback history and curates your most-listened-to artists right in the sidebar.
-![Sidebar Placeholder](https://via.placeholder.com/400x600/131313/68d3ff?text=Sidebar+with+Top+Artists)
 
 ### 4. Seamless Playback
 A persistent bottom player that continues playing your tracks even as you navigate between different pages in the app.
-![Player Placeholder](https://via.placeholder.com/1000x150/131313/68d3ff?text=Persistent+Audio+Player)
 
 ---
 
