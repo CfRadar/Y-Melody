@@ -57,9 +57,7 @@ export default function TopBar({ onToggleNotifications }) {
             <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-tertiary shadow-[0_0_8px_rgba(104,211,255,0.8)]"></span>
           </button>
           
-          <button className="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-white/5 transition-colors duration-300">
-            <span className="material-symbols-outlined">settings</span>
-          </button>
+
           
           <div className="w-10 h-10 rounded-full ml-2 border border-white/10 overflow-hidden cursor-pointer hover:border-primary/50 transition-colors">
             <img alt="User profile" className="w-full h-full object-cover" src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=200&auto=format&fit=crop"/>

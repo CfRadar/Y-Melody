@@ -105,18 +105,7 @@ export default function Sidebar() {
             <span className="material-symbols-outlined" style={{ fontVariationSettings: location.pathname.startsWith('/discover') ? "'FILL' 1" : "'FILL' 0" }}>explore</span>
             Discover
           </Link>
-          <Link to="#" className="flex items-center gap-sm text-on-surface-variant hover:text-on-surface hover:bg-white/10 px-4 py-2 rounded-full transition-all hover:translate-x-1">
-            <span className="material-symbols-outlined">library_music</span>
-            Library
-          </Link>
-          <Link to="#" className="flex items-center gap-sm text-on-surface-variant hover:text-on-surface hover:bg-white/10 px-4 py-2 rounded-full transition-all hover:translate-x-1">
-            <span className="material-symbols-outlined">radio</span>
-            Radio
-          </Link>
-          <Link to="#" className="flex items-center gap-sm text-on-surface-variant hover:text-on-surface hover:bg-white/10 px-4 py-2 rounded-full transition-all hover:translate-x-1">
-            <span className="material-symbols-outlined">auto_awesome</span>
-            Collections
-          </Link>
+
         </div>
 
         {/* Playlists List (Mini) */}
@@ -133,7 +122,7 @@ export default function Sidebar() {
                 <Link to={`/playlist/${playlist._id}`} className={`flex-1 px-2 py-1.5 text-on-surface-variant hover:text-on-surface font-body-md text-sm truncate hover:bg-white/5 rounded-md transition-colors ${location.pathname === `/playlist/${playlist._id}` ? 'text-primary font-medium' : ''}`}>
                   {playlist.name}
                 </Link>
-                <button 
+                <button
                   onClick={(e) => { e.stopPropagation(); e.preventDefault(); setOpenMenuId(openMenuId === playlist._id ? null : playlist._id); }}
                   className="opacity-0 group-hover:opacity-100 p-1 text-on-surface-variant hover:text-primary transition-all rounded-full hover:bg-white/10 shrink-0"
                 >
