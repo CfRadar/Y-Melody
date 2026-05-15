@@ -183,6 +183,19 @@ export default function Dashboard() {
             <h3 className="text-headline-sm font-display-sm font-bold text-on-surface mb-2">Listening History</h3>
             <p className="text-body-lg text-on-surface-variant max-w-2xl">Your recently played organic sounds.</p>
           </div>
+          {history.length > 0 && (
+            <button 
+              onClick={() => {
+                setCurrentTrack(history[0]);
+                setIsPlaying(true);
+                setQueue(history.slice(1));
+              }}
+              className="px-6 py-2 rounded-full bg-primary/10 hover:bg-primary/20 text-primary font-label-lg font-bold flex items-center gap-2 transition-colors border border-primary/20 hover:border-primary/40"
+            >
+              <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
+              Play All
+            </button>
+          )}
         </div>
 
         {history.length > 0 ? (
