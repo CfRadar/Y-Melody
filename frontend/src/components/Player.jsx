@@ -32,6 +32,7 @@ export default function Player({ track, setCurrentTrack, queue, setQueue }) {
   const trackRef = useRef(track);
 
   // Keep refs up to date for closures
+  const playNextRefFunc = useRef(null);
   useEffect(() => {
     queueRef.current = queue;
     setCurrentTrackRef.current = setCurrentTrack;
@@ -132,6 +133,36 @@ export default function Player({ track, setCurrentTrack, queue, setQueue }) {
        }
     }
   };
+
+  useEffect(() => {
+    playNextRefFunc.current = playNext;
+  }, [playNext]);
+
+  // Media Session API for lock screen controls
+  useEffect(() => {
+    if ('mediaSession' in navigator) {
+      const cleanTitle = typeof title === 'string' 
+        ? title.replace(/&amp;/g, '&').replace(/&#39;/g, "'").replace(/&quot;/g, '"') 
+        : 'Unknown Title';
+        
+      navigator.mediaSession.metadata = new window.MediaMetadata({
+        title: cleanTitle,
+        artist: artist,
+        artwork: [
+          { src: thumbnail, sizes: '512x512', type: 'image/jpeg' }
+        ]
+      });
+
+      navigator.mediaSession.setActionHandler('play', () => setPlaying(true));
+      navigator.mediaSession.setActionHandler('pause', () => setPlaying(false));
+      navigator.mediaSession.setActionHandler('previoustrack', () => {
+        if (playerRef.current) playerRef.current.seekTo(0);
+      });
+      navigator.mediaSession.setActionHandler('nexttrack', () => {
+        if (playNextRefFunc.current) playNextRefFunc.current(true);
+      });
+    }
+  }, [title, artist, thumbnail]);
 
   // Handle YouTube events
   const onReady = (event) => {
